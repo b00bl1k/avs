@@ -45,7 +45,7 @@ void opts_parse_args(int argc, char **argv)
     char *endp;
     char c;
 
-    while ((c = getopt(argc, argv, "hp:s:")) != -1) {
+    while ((c = getopt(argc, argv, "hp:")) != -1) {
         switch (c) {
         case 'p':
             errno = 0;
