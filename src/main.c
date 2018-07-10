@@ -34,6 +34,8 @@
 
 #include <sqlite3.h>
 
+#include "opts.h"
+
 int callback_get_test (const struct _u_request * request,
     struct _u_response * response, void * user_data);
 
@@ -46,12 +48,14 @@ int main(int argc, char **argv)
 
     struct _u_instance instance;
 
+    opts_parse_args(argc, argv);
+
     y_init_logs("simple_example", Y_LOG_MODE_CONSOLE, Y_LOG_LEVEL_DEBUG,
         NULL, "Starting simple_example");
 
-    if (ulfius_init_instance(&instance, 5000, NULL, NULL) != U_OK) {
+    if (ulfius_init_instance(&instance, opts_get_port(), NULL, NULL) != U_OK) {
         y_log_message(Y_LOG_LEVEL_ERROR, "Error ulfius_init_instance, abort");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     u_map_put(instance.default_headers, "Access-Control-Allow-Origin", "*");
@@ -78,7 +82,7 @@ int main(int argc, char **argv)
     ulfius_stop_framework(&instance);
     ulfius_clean_instance(&instance);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int callback_get_test(const struct _u_request * request,
