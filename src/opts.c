@@ -27,22 +27,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #define MAX_PORT 65535
 
 static int bind_port = 5000;
+static const char *db_path;
 
-static void usage()
+static void usage(void)
 {
-    printf("Usage: avs [-p port | -h]\n");
+    printf("Usage: avs [-p port | -h] <database>\n");
 }
 
 void opts_parse_args(int argc, char **argv)
 {
+    struct stat path_stat;
     char *endp;
     char c;
 
-    while ((c = getopt(argc, argv, "hp:")) != -1) {
+    while ((c = getopt(argc, argv, "hp:s:")) != -1) {
         switch (c) {
         case 'p':
             errno = 0;
@@ -64,9 +67,31 @@ void opts_parse_args(int argc, char **argv)
             exit(EXIT_FAILURE);
         }
     }
+
+    if (argc < 2 || optind == argc) {
+        usage();
+        exit(EXIT_FAILURE);
+    }
+
+    db_path = argv[optind];
+    if (access(db_path, R_OK) != 0) {
+        error(0, errno, "%s", db_path);
+        exit(EXIT_FAILURE);
+    }
+
+    stat(db_path, &path_stat);
+    if (S_ISREG(path_stat.st_mode) == 0) {
+        error(0, 0, "'%s' is not a file", db_path);
+        exit(EXIT_FAILURE);
+    }
 }
 
 int opts_get_port()
 {
     return bind_port;
+}
+
+const char * opts_get_db_path()
+{
+    return db_path;
 }

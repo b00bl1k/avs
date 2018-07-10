@@ -27,5 +27,6 @@
 
 void opts_parse_args(int, char **);
 int opts_get_port();
+const char * opts_get_db_path();
 
 #endif /* ~__OPTS_H__ */
