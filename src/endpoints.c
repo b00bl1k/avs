@@ -22,11 +22,27 @@
  * SOFTWARE.
  */
 
-#ifndef __OPTS_H__
-#define __OPTS_H__
+#include "endpoints.h"
 
-void opts_parse_args(int, char **);
-int opts_get_port(void);
-const char * opts_get_db_path(void);
+static int ep_api_users(const struct _u_request * request,
+    struct _u_response * response, void * user_data)
+{
+    ulfius_set_string_body_response(response, 200, "{}");
 
-#endif /* ~__OPTS_H__ */
+    return U_CALLBACK_CONTINUE;
+}
+
+static int ep_default(const struct _u_request * request,
+    struct _u_response * response, void * user_data)
+{
+    ulfius_set_string_body_response(response, 404, "Page not found");
+
+    return U_CALLBACK_CONTINUE;
+}
+
+void endpoints_register(struct _u_instance * inst)
+{
+    ulfius_add_endpoint_by_val(inst, "GET", "/api/users", NULL, 0,
+        &ep_api_users, NULL);
+    ulfius_set_default_endpoint(inst, &ep_default, NULL);
+}

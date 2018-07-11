@@ -23,6 +23,7 @@ find_package(SQLite3 REQUIRED)
 set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
 set(AVS_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/main.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/endpoints.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/opts.c)
 
 add_executable(avs ${AVS_SRC})

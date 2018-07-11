@@ -22,11 +22,13 @@
  * SOFTWARE.
  */
 
-#ifndef __OPTS_H__
-#define __OPTS_H__
+#ifndef __ENDPOINTS_H__
+#define __ENDPOINTS_H__
 
-void opts_parse_args(int, char **);
-int opts_get_port(void);
-const char * opts_get_db_path(void);
+#define U_DISABLE_CURL
+#define U_DISABLE_WEBSOCKET
+#include <ulfius.h>
 
-#endif /* ~__OPTS_H__ */
+void endpoints_register(struct _u_instance *);
+
+#endif /* ~__ENDPOINTS_H__ */

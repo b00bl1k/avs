@@ -28,30 +28,20 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define U_DISABLE_CURL
-#define U_DISABLE_WEBSOCKET
-#include <ulfius.h>
-
 #include <sqlite3.h>
 
+#include "endpoints.h"
 #include "opts.h"
-
-int callback_get_test (const struct _u_request * request,
-    struct _u_response * response, void * user_data);
-
-int callback_default (const struct _u_request * request,
-    struct _u_response * response, void * user_data);
 
 int main(int argc, char **argv)
 {
     int ret;
-
     struct _u_instance instance;
 
     opts_parse_args(argc, argv);
 
-    y_init_logs("simple_example", Y_LOG_MODE_CONSOLE, Y_LOG_LEVEL_DEBUG,
-        NULL, "Starting simple_example");
+    y_init_logs("avs", Y_LOG_MODE_CONSOLE, Y_LOG_LEVEL_DEBUG,
+        NULL, NULL);
 
     if (ulfius_init_instance(&instance, opts_get_port(), NULL, NULL) != U_OK) {
         y_log_message(Y_LOG_LEVEL_ERROR, "Error ulfius_init_instance, abort");
@@ -62,41 +52,23 @@ int main(int argc, char **argv)
 
     instance.max_post_body_size = 1024;
 
-    ulfius_add_endpoint_by_val(&instance, "GET", "/", NULL, 0, &callback_get_test, NULL);
-    ulfius_set_default_endpoint(&instance, &callback_default, NULL);
+    endpoints_register(&instance);
 
     ret = ulfius_start_framework(&instance);
 
     if (ret == U_OK) {
-        y_log_message(Y_LOG_LEVEL_DEBUG, "Start framework on port %d",
+        y_log_message(Y_LOG_LEVEL_DEBUG, "Start avs on port %d",
             instance.port);
         getchar();
     }
     else {
-        y_log_message(Y_LOG_LEVEL_DEBUG, "Error starting framework");
+        y_log_message(Y_LOG_LEVEL_DEBUG, "Error starting");
     }
 
-    y_log_message(Y_LOG_LEVEL_DEBUG, "End framework");
     y_close_logs();
 
     ulfius_stop_framework(&instance);
     ulfius_clean_instance(&instance);
 
     return EXIT_SUCCESS;
-}
-
-int callback_get_test(const struct _u_request * request,
-    struct _u_response * response, void * user_data)
-{
-    ulfius_set_string_body_response(response, 200, "Hello World!");
-
-    return U_CALLBACK_CONTINUE;
-}
-
-int callback_default(const struct _u_request * request,
-    struct _u_response * response, void * user_data)
-{
-    ulfius_set_string_body_response(response, 404, "Page not found");
-
-    return U_CALLBACK_CONTINUE;
 }
