@@ -22,47 +22,32 @@
  * SOFTWARE.
  */
 
+#include <errno.h>
+#include <error.h>
+#include <stdlib.h>
+#include <sqlite3.h>
+
 #include "db.h"
-#include "endpoints.h"
 #include "opts.h"
 
-int main(int argc, char **argv)
+void db_init()
 {
-    int ret;
-    struct _u_instance instance;
+    int err;
+    sqlite3 * db;
 
-    opts_parse_args(argc, argv);
-    db_init();
+    if (sqlite3_threadsafe() == 0) {
+		error(0, 0, "The libsqlite version is not threadsafe!\n");
+		exit(EXIT_FAILURE);
+	}
 
-    y_init_logs("avs", Y_LOG_MODE_CONSOLE, Y_LOG_LEVEL_DEBUG,
-        NULL, NULL);
+    err = sqlite3_open_v2(opts_get_db_path(), &db,
+        SQLITE_OPEN_READONLY | SQLITE_OPEN_FULLMUTEX, NULL);
 
-    if (ulfius_init_instance(&instance, opts_get_port(), NULL, NULL) != U_OK) {
-        y_log_message(Y_LOG_LEVEL_ERROR, "Error ulfius_init_instance, abort");
-        return EXIT_FAILURE;
+    if (err != SQLITE_OK) {
+		error(0, 0, "Error while open database %s: %d!\n",
+            opts_get_db_path(), err);
+		exit(EXIT_FAILURE);
     }
 
-    u_map_put(instance.default_headers, "Access-Control-Allow-Origin", "*");
-
-    instance.max_post_body_size = 1024;
-
-    endpoints_register(&instance);
-
-    ret = ulfius_start_framework(&instance);
-
-    if (ret == U_OK) {
-        y_log_message(Y_LOG_LEVEL_DEBUG, "Start avs on port %d",
-            instance.port);
-        getchar();
-    }
-    else {
-        y_log_message(Y_LOG_LEVEL_DEBUG, "Error starting");
-    }
-
-    y_close_logs();
-
-    ulfius_stop_framework(&instance);
-    ulfius_clean_instance(&instance);
-
-    return EXIT_SUCCESS;
+    sqlite3_close(db);
 }
