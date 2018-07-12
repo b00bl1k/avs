@@ -22,12 +22,22 @@
  * SOFTWARE.
  */
 
+#include "db.h"
 #include "endpoints.h"
 
 static int ep_api_users(const struct _u_request * request,
     struct _u_response * response, void * user_data)
 {
-    ulfius_set_empty_body_response(response, 501);
+    int count;
+    char body[64];
+
+    if (db_users_count(&count)) {
+        snprintf(body, sizeof(body), "{\"count\": %d}", count);
+        ulfius_set_string_body_response(response, 200, body);
+    }
+    else {
+        ulfius_set_empty_body_response(response, 500);
+    }
 
     return U_CALLBACK_CONTINUE;
 }

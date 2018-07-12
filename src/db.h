@@ -25,6 +25,9 @@
 #ifndef __DB_H__
 #define __DB_H__
 
+#include <stdbool.h>
+
 void db_init(void);
+bool db_users_count(int *);
 
 #endif /* ~__DB_H__ */
