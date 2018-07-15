@@ -22,6 +22,9 @@
  * SOFTWARE.
  */
 
+#include <errno.h>
+#include <stdlib.h>
+
 #include "db.h"
 #include "endpoints.h"
 
@@ -64,10 +67,34 @@ static int ep_api_users_id(const struct _u_request * request,
     return U_CALLBACK_CONTINUE;
 }
 
-static int ep_api_users_id_stat(const struct _u_request * request,
-    struct _u_response * response, void * user_data)
+static int ep_api_users_id_stat(const struct _u_request *request,
+    struct _u_response *response, void *user_data)
 {
-    ulfius_set_empty_body_response(response, 501);
+    int user_id;
+    char *endp;
+    const char *id_val;
+    json_t *json_body;
+
+    id_val = u_map_get(request->map_url, "id");
+
+    if (id_val == NULL) {
+        ulfius_set_empty_body_response(response, 400);
+        return U_CALLBACK_CONTINUE;
+    }
+
+    errno = 0;
+    user_id = strtoul(id_val, &endp, 10);
+
+    if (errno != 0 || *endp != '\0') {
+        ulfius_set_empty_body_response(response, 400);
+        return U_CALLBACK_CONTINUE;
+    }
+
+    json_body = db_get_users_stat(user_id);
+
+    ulfius_set_json_body_response(response, 200, json_body);
+
+    json_decref(json_body);
 
     return U_CALLBACK_CONTINUE;
 }
@@ -82,11 +109,11 @@ static int ep_default(const struct _u_request * request,
 
 void endpoints_register(struct _u_instance * inst)
 {
-    ulfius_add_endpoint_by_val(inst, "GET", "/api/users", NULL, 0,
+    ulfius_add_endpoint_by_val(inst, "GET", NULL, "/api/users", 0,
         &ep_api_users, NULL);
-    ulfius_add_endpoint_by_val(inst, "GET", "/api/users/:id", NULL, 0,
+    ulfius_add_endpoint_by_val(inst, "GET", NULL, "/api/users/:id", 0,
         &ep_api_users_id, NULL);
-    ulfius_add_endpoint_by_val(inst, "GET", "/api/users/:id/stat", NULL, 0,
+    ulfius_add_endpoint_by_val(inst, "GET", NULL, "/api/users/:id/stat", 0,
         &ep_api_users_id_stat, NULL);
     ulfius_set_default_endpoint(inst, &ep_default, NULL);
 }

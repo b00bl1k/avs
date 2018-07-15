@@ -112,7 +112,8 @@ json_t * db_get_users(int offset, int limit)
     if (db_open(&db) == false)
         return NULL;
 
-    err = sqlite3_prepare_v2(db, "SELECT id, name FROM users ORDER BY id LIMIT ?1, ?2", -1, &stmt, 0);
+    err = sqlite3_prepare_v2(db,
+        "SELECT id, name FROM users ORDER BY id LIMIT ?1, ?2", -1, &stmt, 0);
 
     if (err != SQLITE_OK) {
         y_log_message(Y_LOG_LEVEL_ERROR, "sqlite3_prepare_v2: error %d", err);
@@ -129,6 +130,42 @@ json_t * db_get_users(int offset, int limit)
         json_array_append_new(arr, json_pack("{s:i, s:s}",
             "id", sqlite3_column_int(stmt, 0),
             "name", sqlite3_column_text(stmt, 1)));
+    }
+
+    sqlite3_finalize(stmt);
+    db_close(db);
+
+    return arr;
+}
+
+json_t * db_get_users_stat(int user_id)
+{
+    int err;
+    sqlite3 * db;
+    sqlite3_stmt * stmt;
+    json_t * arr;
+
+    if (db_open(&db) == false)
+        return NULL;
+
+    err = sqlite3_prepare_v2(db,
+        "SELECT user_id, created, added FROM stat WHERE user_id = ?1",
+        -1, &stmt, 0);
+
+    if (err != SQLITE_OK) {
+        y_log_message(Y_LOG_LEVEL_ERROR, "sqlite3_prepare_v2: error %d", err);
+        db_close(db);
+        return NULL;
+    }
+
+    sqlite3_bind_int(stmt, 1, user_id);
+
+    arr = json_array();
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        json_array_append_new(arr, json_pack("{s:s, s:i}",
+            "date", sqlite3_column_text(stmt, 1),
+            "added", sqlite3_column_int(stmt, 2)));
     }
 
     sqlite3_finalize(stmt);

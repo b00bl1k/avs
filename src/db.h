@@ -31,5 +31,6 @@
 void db_init(void);
 bool db_get_users_count(int *);
 json_t * db_get_users(int, int);
+json_t * db_get_users_stat(int);
 
 #endif /* ~__DB_H__ */
