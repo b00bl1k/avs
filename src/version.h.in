@@ -23,7 +23,7 @@
  */
 
 #ifndef __VERSION_H__
-#define __DB___VERSION_H__H__
+#define __VERSION_H__
 
 #define AVS_VERSION "0.0.1"
 #define AVS_SNAPSHOT "@GIT_COMMIT_HASH@"
