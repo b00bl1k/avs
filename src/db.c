@@ -69,7 +69,7 @@ void db_init()
     db_close(db);
 }
 
-bool db_users_count(int * count)
+bool db_get_users_count(int * count)
 {
     int err;
     sqlite3 * db;
@@ -100,4 +100,39 @@ bool db_users_count(int * count)
     db_close(db);
 
     return result;
+}
+
+json_t * db_get_users(int offset, int limit)
+{
+    int err;
+    sqlite3 * db;
+    sqlite3_stmt * stmt;
+    json_t * arr;
+
+    if (db_open(&db) == false)
+        return NULL;
+
+    err = sqlite3_prepare_v2(db, "SELECT id, name FROM users ORDER BY id LIMIT ?1, ?2", -1, &stmt, 0);
+
+    if (err != SQLITE_OK) {
+        y_log_message(Y_LOG_LEVEL_ERROR, "sqlite3_prepare_v2: error %d", err);
+        db_close(db);
+        return NULL;
+    }
+
+    sqlite3_bind_int(stmt, 1, offset);
+    sqlite3_bind_int(stmt, 2, limit);
+
+    arr = json_array();
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        json_array_append_new(arr, json_pack("{s:i, s:s}",
+            "id", sqlite3_column_int(stmt, 0),
+            "name", sqlite3_column_text(stmt, 1)));
+    }
+
+    sqlite3_finalize(stmt);
+    db_close(db);
+
+    return arr;
 }

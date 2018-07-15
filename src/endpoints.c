@@ -29,15 +29,29 @@ static int ep_api_users(const struct _u_request * request,
     struct _u_response * response, void * user_data)
 {
     int count;
-    char body[64];
+    json_t * json_body;
+    json_t * users;
 
-    if (db_users_count(&count)) {
-        snprintf(body, sizeof(body), "{\"count\": %d}", count);
-        ulfius_set_string_body_response(response, 200, body);
-    }
-    else {
+    if (db_get_users_count(&count) == false) {
         ulfius_set_empty_body_response(response, 500);
+        return U_CALLBACK_CONTINUE;
     }
+
+    users = db_get_users(0, 20);
+    if (users == NULL) {
+        ulfius_set_empty_body_response(response, 500);
+        return U_CALLBACK_CONTINUE;
+    }
+
+    json_body = json_object();
+
+    json_object_set_new(json_body, "total", json_integer(count));
+    json_object_set(json_body, "result", users);
+
+    ulfius_set_json_body_response(response, 200, json_body);
+
+    json_decref(users);
+    json_decref(json_body);
 
     return U_CALLBACK_CONTINUE;
 }

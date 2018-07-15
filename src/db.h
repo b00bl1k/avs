@@ -26,8 +26,10 @@
 #define __DB_H__
 
 #include <stdbool.h>
+#include <jansson.h>
 
 void db_init(void);
-bool db_users_count(int *);
+bool db_get_users_count(int *);
+json_t * db_get_users(int, int);
 
 #endif /* ~__DB_H__ */
