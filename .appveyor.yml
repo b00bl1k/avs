@@ -1,0 +1,7 @@
+image: ubuntu
+
+install:
+  - sudo apt-get update
+  - sudo apt-get -y install libmicrohttpd-dev libjansson-dev libsystemd-dev
+
+build_script: mkdir build && cd build && cmake .. && make
