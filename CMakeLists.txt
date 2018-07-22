@@ -93,6 +93,10 @@ if (NOT ULFIUS_FOUND)
 endif ()
 set(LIBS ${LIBS} ${ULFIUS_LIBRARIES})
 
+find_package(SQLite3 REQUIRED)
+include_directories(${SQLITE3_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
+
 set(JANSSON_MIN_VERSION 2.7)
 find_package(Jansson ${JANSSON_MIN_VERSION} REQUIRED)
 set(LIBS ${LIBS} ${JANSSON_LIBRARIES})
