@@ -39,7 +39,7 @@ export default {
     },
     methods: {
         fetch () {
-            var params = { params: { q: this.keywords } }
+            var params = { params: { q: this.keywords, limit: 10 } }
             axios.get('/api/users', params)
                 .then(response => {
                     this.total = response.data.total

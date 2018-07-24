@@ -31,16 +31,24 @@
 static int ep_api_users(const struct _u_request * request,
     struct _u_response * response, void * user_data)
 {
-    int count;
+    int limit = 20;
+    char *endp;
+    const char *limit_val;
     json_t * json_body;
     json_t * users;
 
-    if (db_get_users_count(&count) == false) {
-        ulfius_set_empty_body_response(response, 500);
-        return U_CALLBACK_CONTINUE;
+    limit_val = u_map_get(request->map_url, "limit");
+
+    if (limit_val != NULL) {
+        errno = 0;
+        limit = strtoul(limit_val, &endp, 10);
+        if (errno != 0 || *endp != '\0') {
+            ulfius_set_empty_body_response(response, 400);
+            return U_CALLBACK_CONTINUE;
+        }
     }
 
-    users = db_get_users(0, 20);
+    users = db_get_users(0, limit);
     if (users == NULL) {
         ulfius_set_empty_body_response(response, 500);
         return U_CALLBACK_CONTINUE;
@@ -48,7 +56,6 @@ static int ep_api_users(const struct _u_request * request,
 
     json_body = json_object();
 
-    json_object_set_new(json_body, "total", json_integer(count));
     json_object_set(json_body, "result", users);
 
     ulfius_set_json_body_response(response, 200, json_body);
