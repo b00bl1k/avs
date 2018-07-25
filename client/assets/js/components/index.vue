@@ -11,7 +11,11 @@
             <tbody>
                 <tr v-for="user in users" :key="user.id">
                     <td>{{ user.id }}</td>
-                    <td>{{ user.name }}</td>
+                    <td>
+                        <router-link :to="{ name: 'Stat', params: { id: user.id }}">
+                            {{ user.name }}
+                        </router-link>
+                    </td>
                 </tr>
             </tbody>
         </table>
