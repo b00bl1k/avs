@@ -165,7 +165,7 @@ json_t * db_get_users_stat(int user_id)
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         json_array_append_new(arr, json_pack("{s:s, s:i}",
             "date", sqlite3_column_text(stmt, 1),
-            "added", sqlite3_column_int(stmt, 2)));
+            "count", sqlite3_column_int(stmt, 2)));
     }
 
     sqlite3_finalize(stmt);
