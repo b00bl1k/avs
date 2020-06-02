@@ -30,7 +30,8 @@ function modifyProfilePage()
 
     var cal = new CalHeatMap();
     var prevYear = new Date();
-    prevYear.setFullYear(prevYear.getFullYear() - 1);
+    // prevYear.setFullYear(prevYear.getFullYear() - 1);
+    prevYear.setDate(prevYear.getDate() - 52 * 7);
 
     cal.init({
         range: 53,

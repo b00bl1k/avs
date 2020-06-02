@@ -1,6 +1,6 @@
 {
     "name": "Avto-nomer users activity",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Виджет для отображения данных об активности пользователей сайта avto-nomer.ru",
     "manifest_version": 2,
     "author": "Alexey Ryabov",
@@ -8,13 +8,13 @@
         "128" : "icon.png"
     },
     "permissions": [
-        "activeTab",
-        "http://*.avto-nomer.ru/"
+        "http://*.avto-nomer.ru/",
+        "https://*.avto-nomer.ru/"
     ],
     "homepage_url": "https://avs.b00bl1k.ru",
     "content_scripts": [
         {
-            "matches": ["http://*.avto-nomer.ru/*"],
+            "matches": ["http://*.avto-nomer.ru/*", "https://*.avto-nomer.ru/*"],
             "css": ["cal-heatmap.css"],
             "js": ["d3.min.js", "cal-heatmap.min.js", "contentScript.js"]
         }
