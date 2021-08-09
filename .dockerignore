@@ -1,0 +1,6 @@
+.venv/
+chrome-extension/
+data/
+Dockerfile
+LICENSE
+README.md

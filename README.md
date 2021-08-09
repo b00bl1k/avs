@@ -1,5 +1,8 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/sxj55igr72wdh52a?svg=true)](https://ci.appveyor.com/project/b00bl1k/avs)
+**AVS** это сервис для сбора статистики активности пользователей сайта
+[avto-nomer.ru](https://avto-nomer.ru).
 
-**AVS** это сервис для отображения статистики активности пользователей сайта
-[avto-nomer.ru](https://avto-nomer.ru). Бэкэнд написан с использованием
-библиотеки libulfius.
+Данные можно [запросить по API](https://avs.b00bl1k.ru) или увидеть 
+непосредственно на сайте через виджет, посредством установки google 
+chrome [расширения](https://chrome.google.com/webstore/detail/avto-nomer-users-activity/abpcphhfnnpcaanhbknfnikemhcjbkkn).
+
+![](screenshot-0.png)
