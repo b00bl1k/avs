@@ -1,0 +1,59 @@
+openapi: 3.0.0
+info:
+  title: AVS
+  description: Описание API сервиса AVS
+  version: 1.0.0
+servers:
+  - url: 'https://avs.b00bl1k.ru/api/'
+    description: AVS
+components:
+  schemas:
+    Stat:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            properties:
+              date:
+                type: string
+                format: date
+              count:
+                type: integer
+                description: "Количество добавленных фотографий за указанную дату"
+paths:
+  /users/{userId}/stat:
+    get:
+      tags:
+        - users
+      summary: "Получить статистику о добавленных пользователем фотографиях"
+      parameters:
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date
+          required: false
+          description: Дата, с которой будут выданы данные (по-умолчанию за последние 53 недели)
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stat"
+        404:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "not found"
