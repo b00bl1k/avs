@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import schedule
 import re
 import time
@@ -112,10 +113,22 @@ def migrate():
     db.close()
 
 
-schedule.every().day.at("04:00").do(collect_stats)
-migrate()
-logger.info("started")
+def serve():
+    schedule.every().day.at("04:00").do(collect_stats)
+    migrate()
+    logger.info("started")
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", choices=["runonce", "serve"],
+                        default="serve", const="serve", nargs="?")
+    args = parser.parse_args()
+    if args.command == "runonce":
+        collect_stats()
+    elif args.command == "serve":
+        serve()
