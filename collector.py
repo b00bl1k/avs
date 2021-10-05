@@ -8,6 +8,8 @@ import sqlite3
 import datetime
 import cfscrape
 import logging
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
 from random import randint
 
 URL = "http://avto-nomer.ru/aktivuserall?galak=0&start={}"
@@ -16,6 +18,11 @@ TOP_PAGES = 15
 FORMAT = "%(asctime)s:%(levelname)s:%(module)s:%(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT)
 logger = logging.getLogger("avstat")
+retry_strategy = Retry(
+    total=10,
+    backoff_factor=2,
+    status_forcelist=[429, 500, 502, 503, 504],
+)
 
 
 def get_date():
@@ -84,9 +91,14 @@ def add_record(db, user_id, name, total, added, date):
 
 
 def collect_stats():
+    retry_adapter = HTTPAdapter(max_retries=retry_strategy)
+
     start_time = time.time()
     db = sqlite3.connect("data/stat.db")
     scraper = cfscrape.create_scraper()
+    scraper.mount("https://", retry_adapter)
+    scraper.mount("http://", retry_adapter)
+
     date = get_date()
     logger.info("previous date %s" % date)
 
