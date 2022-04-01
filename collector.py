@@ -12,7 +12,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 from random import randint
 
-URL = "http://avto-nomer.ru/aktivuserall?galak=0&start={}"
+URL = "https://platesmania.com/aktivuserall?galak=0&start={}"
 TOP_PAGES = 15
 
 FORMAT = "%(asctime)s:%(levelname)s:%(module)s:%(message)s"
